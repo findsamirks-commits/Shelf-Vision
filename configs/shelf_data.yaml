@@ -1,0 +1,17 @@
+path: ./data
+train: images/train
+val: images/val
+
+names:
+  0: Amul Butter 500g
+  1: Mother Dairy Butter 500g
+  2: Milkbasket Fresh Paneer 200g
+  3: Amul Cheese Slices 200g
+  4: Britannia Cheese Block 200g
+  5: Nestle Milkmaid 400g
+  6: Milkbasket Ghee 500ml
+  7: Nestle Everyday Dairy Whitener 1kg
+  8: Amul Spray Milk Powder 500g
+  9: Mother Dairy Cow Ghee 1L
+  10: Milkbasket Organic Cow Ghee 1L
+  11: Competitor Encroaching SKU

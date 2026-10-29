@@ -1,0 +1,122 @@
+{
+  "shelf_id": "MILKBASKET-HUB-A4-BAY2",
+  "category": "Dairy & Breakfast Spreads",
+  "shelf_dimensions": {
+    "width_px": 1280,
+    "height_px": 720
+  },
+  "slots": [
+    {
+      "slot_id": "S1-P01",
+      "shelf_tier": 1,
+      "expected_sku": "Amul Butter 500g",
+      "brand": "Amul",
+      "box_norm": [0.05, 0.10, 0.20, 0.35],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S1-P02",
+      "shelf_tier": 1,
+      "expected_sku": "Amul Butter 500g",
+      "brand": "Amul",
+      "box_norm": [0.22, 0.10, 0.37, 0.35],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S1-P03",
+      "shelf_tier": 1,
+      "expected_sku": "Mother Dairy Butter 500g",
+      "brand": "Mother Dairy",
+      "box_norm": [0.42, 0.10, 0.57, 0.35],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S1-P04",
+      "shelf_tier": 1,
+      "expected_sku": "Mother Dairy Butter 500g",
+      "brand": "Mother Dairy",
+      "box_norm": [0.59, 0.10, 0.74, 0.35],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S1-P05",
+      "shelf_tier": 1,
+      "expected_sku": "Milkbasket Fresh Paneer 200g",
+      "brand": "Milkbasket Private Label",
+      "box_norm": [0.78, 0.10, 0.93, 0.35],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S2-P01",
+      "shelf_tier": 2,
+      "expected_sku": "Amul Cheese Slices 200g",
+      "brand": "Amul",
+      "box_norm": [0.05, 0.40, 0.20, 0.65],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S2-P02",
+      "shelf_tier": 2,
+      "expected_sku": "Amul Cheese Slices 200g",
+      "brand": "Amul",
+      "box_norm": [0.22, 0.40, 0.37, 0.65],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S2-P03",
+      "shelf_tier": 2,
+      "expected_sku": "Britannia Cheese Block 200g",
+      "brand": "Britannia",
+      "box_norm": [0.42, 0.40, 0.57, 0.65],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S2-P04",
+      "shelf_tier": 2,
+      "expected_sku": "Nestle Milkmaid 400g",
+      "brand": "Nestle",
+      "box_norm": [0.59, 0.40, 0.74, 0.65],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S2-P05",
+      "shelf_tier": 2,
+      "expected_sku": "Milkbasket Ghee 500ml",
+      "brand": "Milkbasket Private Label",
+      "box_norm": [0.78, 0.40, 0.93, 0.65],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S3-P01",
+      "shelf_tier": 3,
+      "expected_sku": "Nestle Everyday Dairy Whitener 1kg",
+      "brand": "Nestle",
+      "box_norm": [0.05, 0.70, 0.22, 0.95],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S3-P02",
+      "shelf_tier": 3,
+      "expected_sku": "Amul Spray Milk Powder 500g",
+      "brand": "Amul",
+      "box_norm": [0.26, 0.70, 0.43, 0.95],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S3-P03",
+      "shelf_tier": 3,
+      "expected_sku": "Mother Dairy Cow Ghee 1L",
+      "brand": "Mother Dairy",
+      "box_norm": [0.48, 0.70, 0.65, 0.95],
+      "min_facings": 1
+    },
+    {
+      "slot_id": "S3-P04",
+      "shelf_tier": 3,
+      "expected_sku": "Milkbasket Organic Cow Ghee 1L",
+      "brand": "Milkbasket Private Label",
+      "box_norm": [0.72, 0.70, 0.93, 0.95],
+      "min_facings": 1
+    }
+  ]
+}
