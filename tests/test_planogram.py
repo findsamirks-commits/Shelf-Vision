@@ -1,6 +1,13 @@
 import os
+import sys
 import json
 import pytest
+
+# Ensure the project root directory is in sys.path
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 from src.planogram_matcher import PlanogramMatcher, compute_iou, compute_center_distance
 from src.compliance_engine import ComplianceEngine
 
