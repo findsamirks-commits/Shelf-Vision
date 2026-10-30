@@ -112,6 +112,13 @@ with st.sidebar:
     st.markdown("🟨 **Misplaced:** Wrong SKU in slot")
     st.markdown("🟥 **Encroached:** Competitor/rogue SKU in slot")
 
+    st.markdown("---")
+    st.markdown("### 👨‍💻 Developer & Architect")
+    st.markdown("**Samir Sandhwar** | Category Head & AI Engineer")
+    st.markdown("[![GitHub](https://img.shields.io/badge/GitHub-findsamirks--commits-black?style=flat&logo=github)](https://github.com/findsamirks-commits/Shelf-Vision)")
+    st.markdown("[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-findsamirks-FFD21E?style=flat&logo=huggingface&logoColor=black)](https://huggingface.co/findsamirks)")
+    st.markdown("[![LinkedIn](https://img.shields.io/badge/LinkedIn-samirsandhwar-0077B5?style=flat&logo=linkedin)](https://www.linkedin.com/in/samirsandhwar)")
+
 # -----------------------------------------------------------------------------
 # Main Application Flow
 # -----------------------------------------------------------------------------
