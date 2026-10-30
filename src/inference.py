@@ -9,14 +9,24 @@ Coordinates:
 
 import json
 import os
+import sys
 import time
 from typing import Any, Dict, List, Optional, Tuple
 import cv2
 import numpy as np
 from PIL import Image
 
-from src.planogram_matcher import PlanogramMatcher
-from src.compliance_engine import ComplianceEngine
+# Ensure local imports work whether running as package or standalone script
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+try:
+    from src.planogram_matcher import PlanogramMatcher
+    from src.compliance_engine import ComplianceEngine
+except ImportError:
+    from planogram_matcher import PlanogramMatcher
+    from compliance_engine import ComplianceEngine
 
 
 STATUS_COLORS = {
@@ -137,6 +147,11 @@ class ShelfVisionPipeline:
         annotated_img = self.render_annotated_shelf(image_path, matched_slots)
         return report, annotated_img
 
+    def run_audit(self, image_path: str) -> Dict[str, Any]:
+        """Convenience alias returning only the report JSON dictionary."""
+        report, _ = self.audit_shelf(image_path)
+        return report
+
     def render_annotated_shelf(self, image_path: str, matched_slots: List[Dict[str, Any]]) -> np.ndarray:
         """Draws bounding boxes, compliance flags, and labels onto shelf image."""
         img = cv2.imread(image_path)
@@ -192,3 +207,20 @@ class ShelfVisionPipeline:
                 )
 
         return img
+if __name__ == "__main__":
+    # Define paths relative to where the script is executed from
+    image_path = "assets/demo_shelf.jpg" 
+    planogram_path = "configs/planogram_sample.json"
+    
+    try:
+        # Pass the planogram_path into the class instantiation
+        pipeline = ShelfVisionPipeline(planogram_path)
+        
+        # Call the audit method (you likely only need to pass the image_path here now)
+        report = pipeline.run_audit(image_path)
+        
+        # Print the resulting JSON report to the terminal
+        print("\n--- SHELF AUDIT REPORT ---")
+        print(json.dumps(report, indent=2))
+    except Exception as e:
+        print(f"Error running inference: {e}")
