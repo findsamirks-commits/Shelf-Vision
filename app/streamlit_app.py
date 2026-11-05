@@ -164,10 +164,10 @@ with col_left:
     view_option = st.radio("Display View:", ["Annotated Detections (YOLOv8 + Bipartite)", "Raw Shelf Photo"], horizontal=True)
 
     if view_option.startswith("Annotated"):
-        st.image(annotated_rgb, caption="Shelf-Vision Automated Detection Overlay (Bounding Boxes + Compliance Flags)", use_container_width=True)
+        st.image(annotated_rgb, caption="Shelf-Vision Automated Detection Overlay (Bounding Boxes + Compliance Flags)", width="stretch")
     else:
         raw_img = Image.open(DEMO_IMG_PATH)
-        st.image(raw_img, caption="Raw Dark-Store Audit Photo (Before Detection)", use_container_width=True)
+        st.image(raw_img, caption="Raw Dark-Store Audit Photo (Before Detection)", width="stretch")
 
 with col_right:
     st.subheader("📈 Brand Share-of-Shelf (SoS)")
