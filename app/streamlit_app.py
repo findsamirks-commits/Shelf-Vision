@@ -7,10 +7,16 @@ brand share-of-shelf charts, and downloadable compliance JSON reports.
 
 import json
 import os
+import sys
 import cv2
 import pandas as pd
 from PIL import Image
 import streamlit as st
+
+# Ensure project root is in sys.path for Streamlit Cloud deployment
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 
 from src.inference import ShelfVisionPipeline
 from src.data_prep import generate_synthetic_shelf_image, load_planogram

@@ -1,4 +1,13 @@
 # Shelf-Vision 🛒👁️
+
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://shelf-vision.streamlit.app)
+[![GitHub](https://img.shields.io/badge/GitHub-findsamirks--commits-black?style=flat&logo=github)](https://github.com/findsamirks-commits/Shelf-Vision)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](https://python.org)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C?logo=pytorch)](https://pytorch.org)
+[![Ultralytics YOLOv8](https://img.shields.io/badge/YOLOv8-Object_Detection-00599C?logo=opencv&logoColor=white)](https://github.com/ultralytics/ultralytics)
+
+> 🌐 **Live Interactive Streamlit Demo:** [shelf-vision.streamlit.app](https://shelf-vision.streamlit.app)
+
 **Planogram Compliance & Out-of-Stock (OOS) Detection for Retail Shelves — powered by YOLOv8 object detection.**
 
 A deep learning computer vision pipeline that audits retail shelf photos to automatically answer three questions store ops teams ask every day:
