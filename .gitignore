@@ -2,9 +2,15 @@ __pycache__/
 *.pyc
 .venv/
 runs/
-*.pt
 *.onnx
 .DS_Store
-data/raw/
-data/processed/
 .env
+
+# Datasets generated on demand
+data/images/
+data/labels/
+*.cache
+
+# Model checkpoints (allow canonical production weights)
+*.pt
+!weights/best.pt

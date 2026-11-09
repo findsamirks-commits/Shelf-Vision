@@ -2,12 +2,15 @@
 
 Generates realistic retail shelf audit images with brand packaging colors,
 text labeling, deliberate OOS empty slots, and encroaching items for testing.
+Also generates full YOLOv8 formatted datasets with images/ and labels/ splits.
 """
 
+import argparse
 import json
 import os
 import random
-from typing import Dict, List, Tuple
+import sys
+from typing import Dict, List, Optional, Tuple
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -20,6 +23,21 @@ BRAND_PALETTE = {
     "Competitor Encroaching SKU": (75, 85, 99), # Slate Grey
 }
 
+CLASS_TO_ID = {
+    "Amul Butter 500g": 0,
+    "Mother Dairy Butter 500g": 1,
+    "Milkbasket Fresh Paneer 200g": 2,
+    "Amul Cheese Slices 200g": 3,
+    "Britannia Cheese Block 200g": 4,
+    "Nestle Milkmaid 400g": 5,
+    "Milkbasket Ghee 500ml": 6,
+    "Nestle Everyday Dairy Whitener 1kg": 7,
+    "Amul Spray Milk Powder 500g": 8,
+    "Mother Dairy Cow Ghee 1L": 9,
+    "Milkbasket Organic Cow Ghee 1L": 10,
+    "Competitor Encroaching SKU": 11,
+}
+
 
 def load_planogram(config_path: str) -> dict:
     with open(config_path, "r", encoding="utf-8") as f:
@@ -29,9 +47,10 @@ def load_planogram(config_path: str) -> dict:
 def generate_synthetic_shelf_image(
     planogram: dict,
     output_image_path: str,
-    oos_slot_ids: List[str] = None,
-    encroached_slot_ids: Dict[str, str] = None,
-    misplaced_slot_ids: Dict[str, str] = None,
+    oos_slot_ids: Optional[List[str]] = None,
+    encroached_slot_ids: Optional[Dict[str, str]] = None,
+    misplaced_slot_ids: Optional[Dict[str, str]] = None,
+    bg_color: Optional[Tuple[int, int, int]] = None,
 ) -> Tuple[str, List[dict]]:
     """Draws a synthetic dark store shelf photo with designated OOS or misplaced SKUs.
 
@@ -47,7 +66,8 @@ def generate_synthetic_shelf_image(
     height = planogram["shelf_dimensions"]["height_px"]
 
     # Shelf background: industrial dark store shelving (cool dark metallic)
-    img = Image.new("RGB", (width, height), color=(30, 41, 59))
+    bg = bg_color or (random.randint(25, 38), random.randint(35, 48), random.randint(50, 65))
+    img = Image.new("RGB", (width, height), color=bg)
     draw = ImageDraw.Draw(img)
 
     # Draw shelf rails for 3 tiers
@@ -75,7 +95,7 @@ def generate_synthetic_shelf_image(
 
         # Scenario 2: Competitor Encroachment
         if slot_id in encroached_slot_ids:
-            sku_name = encroached_slot_ids[slot_id]
+            sku_name = "Competitor Encroaching SKU"
             brand = "Competitor Encroaching SKU"
             fill_color = BRAND_PALETTE[brand]
         # Scenario 3: Misplaced Product
@@ -121,18 +141,125 @@ def generate_synthetic_shelf_image(
     return output_image_path, rendered_detections
 
 
+def generate_yolo_dataset(
+    planogram_path: str,
+    output_dir: str = "data",
+    n_train: int = 60,
+    n_val: int = 15,
+    seed: int = 42,
+) -> Dict[str, int]:
+    """Generates complete YOLOv8 formatted training and validation splits."""
+    random.seed(seed)
+    planogram = load_planogram(planogram_path)
+    width = planogram["shelf_dimensions"]["width_px"]
+    height = planogram["shelf_dimensions"]["height_px"]
+
+    all_slots = [s["slot_id"] for s in planogram["slots"]]
+    sample_skus = list(CLASS_TO_ID.keys())
+
+    splits = [("train", n_train), ("val", n_val)]
+    counts = {"train": 0, "val": 0, "total_boxes": 0}
+
+    for split_name, num_samples in splits:
+        img_dir = os.path.join(output_dir, "images", split_name)
+        lbl_dir = os.path.join(output_dir, "labels", split_name)
+        os.makedirs(img_dir, exist_ok=True)
+        os.makedirs(lbl_dir, exist_ok=True)
+
+        for i in range(1, num_samples + 1):
+            file_stem = f"shelf_{split_name}_{i:04d}"
+            img_path = os.path.join(img_dir, f"{file_stem}.jpg")
+            lbl_path = os.path.join(lbl_dir, f"{file_stem}.txt")
+
+            # Stochastically inject realistic retail failure modes
+            num_oos = random.choices([0, 1, 2, 3], weights=[0.25, 0.35, 0.25, 0.15])[0]
+            oos_slots = random.sample(all_slots, k=num_oos) if num_oos > 0 else []
+
+            remaining_slots = [s for s in all_slots if s not in oos_slots]
+            num_misplaced = random.choices([0, 1, 2], weights=[0.6, 0.3, 0.1])[0]
+            misplaced_slots = {}
+            if num_misplaced > 0 and len(remaining_slots) >= num_misplaced:
+                chosen = random.sample(remaining_slots, k=num_misplaced)
+                for c in chosen:
+                    misplaced_slots[c] = random.choice(sample_skus[:8])
+                    remaining_slots.remove(c)
+
+            num_encroached = random.choices([0, 1], weights=[0.75, 0.25])[0]
+            encroached_slots = {}
+            if num_encroached > 0 and len(remaining_slots) >= num_encroached:
+                chosen = random.sample(remaining_slots, k=num_encroached)
+                for c in chosen:
+                    encroached_slots[c] = "Competitor Encroaching SKU"
+
+            # Render image
+            _, detections = generate_synthetic_shelf_image(
+                planogram=planogram,
+                output_image_path=img_path,
+                oos_slot_ids=oos_slots,
+                encroached_slot_ids=encroached_slots,
+                misplaced_slot_ids=misplaced_slots,
+            )
+
+            # Write YOLO label format: <class_id> <x_center> <y_center> <w> <h>
+            label_lines = []
+            for det in detections:
+                sku_name = det["sku_name"]
+                cls_id = CLASS_TO_ID.get(sku_name, 11)
+                bx1, by1, bx2, by2 = det["box_px"]
+
+                x_center = ((bx1 + bx2) / 2.0) / width
+                y_center = ((by1 + by2) / 2.0) / height
+                w_norm = (bx2 - bx1) / float(width)
+                h_norm = (by2 - by1) / float(height)
+
+                # Clamp within [0, 1]
+                x_center = max(0.0, min(1.0, x_center))
+                y_center = max(0.0, min(1.0, y_center))
+                w_norm = max(0.0, min(1.0, w_norm))
+                h_norm = max(0.0, min(1.0, h_norm))
+
+                label_lines.append(f"{cls_id} {x_center:.6f} {y_center:.6f} {w_norm:.6f} {h_norm:.6f}\n")
+                counts["total_boxes"] += 1
+
+            with open(lbl_path, "w", encoding="utf-8") as f:
+                f.writelines(label_lines)
+
+            counts[split_name] += 1
+
+    return counts
+
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Shelf-Vision data preparation & dataset generator.")
+    parser.add_argument("--generate-yolo", action="store_true", help="Generate full YOLOv8 dataset")
+    parser.add_argument("--train-samples", type=int, default=60, help="Number of training images")
+    parser.add_argument("--val-samples", type=int, default=15, help="Number of validation images")
+    parser.add_argument("--output-dir", type=str, default="data", help="Output directory")
+    args = parser.parse_args()
+
     planogram_file = os.path.join(os.path.dirname(__file__), "..", "configs", "planogram_sample.json")
     demo_image = os.path.join(os.path.dirname(__file__), "..", "assets", "demo_shelf.jpg")
 
     plano = load_planogram(planogram_file)
-    # Generate test image with 2 OOS slots and 1 misplaced item
-    img_path, dets = generate_synthetic_shelf_image(
-        planogram=plano,
-        output_image_path=demo_image,
-        oos_slot_ids=["S1-P03", "S2-P04"], # Mother Dairy Butter OOS, Nestle Milkmaid OOS
-        misplaced_slot_ids={"S2-P02": "Nestle Everyday Dairy Whitener 1kg"},
-        encroached_slot_ids={"S3-P04": "Competitor Rogue Ghee 1L"},
-    )
-    print(f"Generated synthetic dark-store shelf image: {img_path}")
-    print(f"Rendered {len(dets)} detected facings across shelf grid.")
+
+    if args.generate_yolo:
+        out_path = os.path.join(os.path.dirname(__file__), "..", args.output_dir)
+        print(f"Generating YOLOv8 dataset in: {out_path}")
+        stats = generate_yolo_dataset(
+            planogram_path=planogram_file,
+            output_dir=out_path,
+            n_train=args.train_samples,
+            n_val=args.val_samples,
+        )
+        print(f"✅ Generated {stats['train']} training images, {stats['val']} validation images ({stats['total_boxes']} total SKU bounding boxes).")
+    else:
+        # Generate default fixture demo image
+        img_path, dets = generate_synthetic_shelf_image(
+            planogram=plano,
+            output_image_path=demo_image,
+            oos_slot_ids=["S1-P03", "S2-P04"],
+            misplaced_slot_ids={"S2-P02": "Nestle Everyday Dairy Whitener 1kg"},
+            encroached_slot_ids={"S3-P04": "Competitor Rogue Ghee 1L"},
+        )
+        print(f"Generated synthetic dark-store shelf image: {img_path}")
+        print(f"Rendered {len(dets)} detected facings across shelf grid.")

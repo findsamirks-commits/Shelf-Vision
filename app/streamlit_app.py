@@ -8,6 +8,10 @@ brand share-of-shelf charts, and downloadable compliance JSON reports.
 import json
 import os
 import sys
+
+# Ensure Polars CPU feature checks don't crash on ARM64 / emulated CPUs
+os.environ["POLARS_SKIP_CPU_CHECK"] = "1"
+
 import cv2
 import pandas as pd
 from PIL import Image

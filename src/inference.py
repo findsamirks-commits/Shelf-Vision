@@ -48,12 +48,17 @@ class ShelfVisionPipeline:
         self.model_weights = model_weights
         self.yolo_model = None
 
-        if model_weights and os.path.exists(model_weights):
+        if not self.model_weights:
+            candidate_weights = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "weights", "best.pt")
+            if os.path.exists(candidate_weights):
+                self.model_weights = candidate_weights
+
+        if self.model_weights and os.path.exists(self.model_weights):
             try:
                 from ultralytics import YOLO
-                self.yolo_model = YOLO(model_weights)
+                self.yolo_model = YOLO(self.model_weights)
             except Exception as e:
-                print(f"Warning: Could not load YOLO model weights from {model_weights}: {e}")
+                print(f"Warning: Could not load YOLO model weights from {self.model_weights}: {e}")
 
     def detect_skus(self, image_path: str) -> Tuple[List[Dict[str, Any]], float]:
         """Detects SKUs on the shelf image.

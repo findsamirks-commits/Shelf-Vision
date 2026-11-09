@@ -1,7 +1,10 @@
 import os
 import sys
 import json
-import pytest
+try:
+    import pytest
+except ImportError:
+    pytest = None
 
 # Ensure the project root directory is in sys.path
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -68,3 +71,12 @@ def test_hungarian_matching():
     assert report["compliance_score"] == 50.0
     assert report["oos_facings"] == 1
     assert report["compliant_facings"] == 1
+
+
+if __name__ == "__main__":
+    print("Running Shelf-Vision unit tests...")
+    test_compute_iou()
+    print("  test_compute_iou passed")
+    test_hungarian_matching()
+    print("  test_hungarian_matching passed")
+    print("All tests passed successfully!")
